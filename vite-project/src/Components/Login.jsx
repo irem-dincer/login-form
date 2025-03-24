@@ -4,9 +4,9 @@ import {Button , Form, FormGroup , Label ,Input, Card, CardHeader, FormFeedback,
 import axios from'axios';
 
 
-const ErrorMessages={
-    name:"Name is required",
-    surname:"Surname is required",
+export const ErrorMessages={ 
+    name:"Please enter your name at least 3 characters",
+    surname:"Please enter your surname at least 3 characters",
     email:"Enter a valid email address",
     password:"Must be at least 8 characters, at least 1 uppercase letter, at least 1 lowercase letter, at least 1 symbol,at least 1 number",
 }
@@ -52,7 +52,7 @@ const handleChange=(event)=>{
     console.log(formData); 
 
 if(name==="name"){
-    if(value.trim().length===0){
+    if(value.trim().length<3){
         setErrors({...errors,[name]:true});
         setIsValid(false);
 
@@ -64,7 +64,7 @@ if(name==="name"){
     }
 
     if(name==="surname"){
-        if(value.trim().length===0){
+        if(value.trim().length<3){
             setErrors({...errors,[name]:true});
             setIsValid(false);
     
@@ -149,9 +149,10 @@ return (
       onChange={handleChange}
       value={formData.name}
       invalid={errors.name} //if errors.name is true,then the input field will be red.
+      data-cy="name-input"
     />
     {errors.name &&
-      <FormFeedback>
+      <FormFeedback  data-cy="error-messages">
  {ErrorMessages.name}
     </FormFeedback>
 }
@@ -169,9 +170,10 @@ return (
       onChange={handleChange}
       value={formData.surname}
       invalid={errors.surname}
+        data-cy="surname-input"
     />
        {errors.surname &&
-      <FormFeedback>
+      <FormFeedback  data-cy="error-messages">
  {ErrorMessages.surname}
     </FormFeedback>
 }
@@ -188,9 +190,10 @@ return (
       onChange={handleChange}
       value={formData.email}
       invalid={errors.email}
+        data-cy="email-input"
     />
            {errors.email &&
-      <FormFeedback>
+      <FormFeedback  data-cy="error-messages">
  {ErrorMessages.email}
     </FormFeedback>
 }
@@ -207,24 +210,25 @@ return (
       onChange={handleChange}
       value={formData.password}
       invalid={errors.password}
+        data-cy="password-input"
     />
                {errors.password &&
-      <FormFeedback>
+      <FormFeedback  data-cy="error-messages">
  {ErrorMessages.password}
     </FormFeedback>
 }
   </FormGroup>
  
 
-  <Button type="submit" disabled={!isValid}>
+  <Button type="submit" disabled={!isValid} data-cy="submit-button">
  Submit
   </Button>
 </Form>
 </CardBody>
 
-<CardFooter>
+{ id &&<CardFooter  data-cy="result-message">
   ID:{id}
-</CardFooter>
+</CardFooter> }
 </Card>
 
 )
