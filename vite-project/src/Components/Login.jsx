@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {Button , Form, FormGroup , Label ,Input, Card, CardHeader, FormFeedback, CardBody, CardFooter} from 'reactstrap';
 
 import axios from'axios';
+import { useNavigate } from 'react-router-dom';
 
 
 export const ErrorMessages={ 
@@ -9,18 +10,21 @@ export const ErrorMessages={
     surname:"Please enter your surname at least 3 characters",
     email:"Enter a valid email address",
     password:"Must be at least 8 characters, at least 1 uppercase letter, at least 1 lowercase letter, at least 1 symbol,at least 1 number",
+    terms:"You must accept the terms and conditions"
 }
 
 export default function Login() {
  
+const navigate=useNavigate(); //navigate to success page!
+
  const[formData,setFormData]=useState({name:"",surname:"",email:"",password:""}); //form data
 
 
- const[errors,setErrors]=useState({name:false,surname:false,email:false,password:false}); //validation errors
+ const[errors,setErrors]=useState({name:false,surname:false,email:false,password:false,terms:false}); //validation errors
 const[isValid,setIsValid]=useState(false); //form validation
 const [id, setId]=useState("");
 
-const validateEmail = (email) => {
+const validateEmail = (email) => { //email validation
     return String(email)
       .toLowerCase()
       .match(
@@ -28,10 +32,10 @@ const validateEmail = (email) => {
       );
   };
 
-  let regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&])[A-Za-z\d@.#$!%*?&]{8,15}$/;
+  let regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@.#$!%*?&])[A-Za-z\d@.#$!%*?&]{8,15}$/; //password regex
 
   useEffect(()=>{
-if(formData.name.trim().length>0 && formData.surname.trim().length>0 && validateEmail(formData.email) && regex.test(formData.password)) {
+if(formData.name.trim().length>0 && formData.surname.trim().length>0 && validateEmail(formData.email) && regex.test(formData.password) && formData.terms) {
     
    
 setIsValid(true)
@@ -46,9 +50,11 @@ setIsValid(true)
 
 
 const handleChange=(event)=>{
+  let { name, value, type, checked } = event.target;
 
-    const {name,value}=event.target; //destructing
-    setFormData({...formData,[name]:value}); //spread operator
+  value = type === 'checkbox' ? checked : value;
+
+  setFormData({ ...formData, [name]: value });
     console.log(formData); 
 
 if(name==="name"){
@@ -119,21 +125,24 @@ const handleSubmit=(event)=>{
     axios.post("https://reqres.in/api/users",formData).then(response=>{ //post request
         console.log(response.data);
         setId(response.data.id); //get the id of the user
+        navigate("/success"); //navigate to success page
        
 
     })
     .catch(error=>{
         console.log("Error:",error);
+        alert("Error in form submission");
+
 
     })
-    setFormData({name:"",surname:"",email:"",password:""}); //clear the form after submission
+    setFormData({name:"",surname:"",email:"",password:"",terms:false}); //clear the form after submission
 
- //??????????????????????????????????????????????????????????????????????
+
 }
 
 
 return (
-<Card> 
+<Card>
     <CardHeader>Sign In</CardHeader>
     <CardBody>
 <Form onSubmit={handleSubmit}>
@@ -218,6 +227,23 @@ return (
     </FormFeedback>
 }
   </FormGroup>
+
+  <FormGroup check>
+        <Input
+          id="terms"
+          name="terms"
+          checked={formData.terms}
+          type="checkbox"
+          onChange={handleChange}
+          invalid={errors.terms}
+          data-cy="terms-input"
+         
+        />{' '}
+        <Label htmlFor="terms" check>
+          I agree to terms of service and privacy policy
+        </Label>
+        {errors.terms && <FormFeedback>{ErrorMessages.terms}</FormFeedback>}
+      </FormGroup>
  
 
   <Button type="submit" disabled={!isValid} data-cy="submit-button">
